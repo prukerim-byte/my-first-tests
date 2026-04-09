@@ -1,41 +1,38 @@
 const { test, expect} = require('@playwright/test');
+const { LoginPage } = require("../pages/LoginPage");
 
 test.describe("Login", () => {
 
-    test.beforeEach(async({ page }) => {
-        await page.goto("https://the-internet.herokuapp.com/login");
-    });
-
     test("valid credentials redirect away from login page", async({ page }) => {
-        await page.locator("#username").fill("tomsmith");
-        await page.locator("#password").fill("SuperSecretPassword!");
-        await page.getByRole("button", {name: "Login"}).click();
-
+        const loginPage = new LoginPage(page);
+        await loginPage.goto();
+        await loginPage.login("tomsmith", "SuperSecretPassword!");
+        // assertion
         await expect(page).toHaveURL("https://the-internet.herokuapp.com/secure");
     });
 
     test("wrong password > shows error message", async({ page }) => {
-        await page.locator("#username").fill("tomsmith");
-        await page.locator("#password").fill("WrongPasss");
-        await page.getByRole("button", {name: "Login"}).click();
-        
-        await expect(page.locator("#flash")).toHaveText(/Your password is invalid!/);
+        const loginPage = new LoginPage(page);
+        await loginPage.goto();
+        await loginPage.login("tomsmith", "Wrongpass");
+        // assertion
+        await expect(await loginPage.getFlashMessage()).toHaveText(/Your password is invalid!/);
     });
 
     test("empty username field > shows error message", async({ page }) => {
-        await page.locator("#username").fill("");
-        await page.locator("#password").fill("");
-        await page.getByRole("button", {name: "Login"}).click();
-        
-        await expect(page.locator("#flash")).toHaveText(/Your username is invalid!/);
+        const loginPage = new LoginPage(page);
+        await loginPage.goto();
+        await loginPage.login("", "asdasd");
+        // assertion
+        await expect(await loginPage.getFlashMessage()).toHaveText(/Your username is invalid!/);
     });
 
     test("empty password field after typing username > shows error message", async({ page }) => {
-            await page.locator("#username").fill("tomsmith");
-            await page.locator("#password").fill("");
-            await page.getByRole("button", {name: "Login"}).click();
-            
-            await expect(page.locator("#flash")).toHaveText(/Your password is invalid!/);
+        const loginPage = new LoginPage(page);
+        await loginPage.goto();
+        await loginPage.login("tomsmith", "");
+        // assertion            
+        await expect(await loginPage.getFlashMessage()).toHaveText(/Your password is invalid!/);
         });
 
 
