@@ -8,7 +8,7 @@ class LoginPage{
     }
 
     async goto() {
-        await this.page.goto("https://the-internet.herokuapp.com/login");
+        await this.page.goto("/login");
     }
 
     async login(username, password) {
