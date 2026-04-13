@@ -1,12 +1,17 @@
 import { test, expect} from '@playwright/test'; 
 import { LoginPage } from '../pages/LoginPage';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const username = process.env.TEST_USERNAME;
+const password = process.env.TEST_PASSWORD;
 
 test.describe("Login", () => {
 
     test("valid credentials redirect away from login page", async({ page }) => {
         const loginPage = new LoginPage(page);
         await loginPage.goto();
-        await loginPage.login("tomsmith", "SuperSecretPassword!");
+        await loginPage.login(username, password);
         // assertion
         await expect(page).toHaveURL("https://the-internet.herokuapp.com/secure");
     });
